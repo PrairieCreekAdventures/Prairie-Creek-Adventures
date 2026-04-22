@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const recipes = await getCollection('recipes', ({ data }) => !data.draft);
+  return recipes.map(recipe => ({
+    params: { slug: recipe.id },
+    props: { recipe },
+  }));
+}
+
+const { recipe } = Astro.props;
+const { Content } = await render(recipe);
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+---
+
+<BaseLayout title={`${recipe.data.title} — Prairie Creek Farms`} description={recipe.data.tagline}>
+
+<article class="single">
+  <header class="single__header">
+    <span class="single__cat">Recipe · {recipe.data.season}</span>
+    <h1 class="single__title">{recipe.data.title}</h1>
+    <p class="single__tagline">{recipe.data.tagline}</p>
+    <div class="single__meta">
+      <span>By {recipe.data.author}</span>
+      <span class="dot">·</span>
+      <span>{fmtDate(recipe.data.date)}</span>
+    </div>
+  </header>
+
+  <div class="recipe-detail__specs">
+    <div class="recipe-spec">
+      <span class="recipe-spec__label">Time</span>
+      <span class="recipe-spec__value">{recipe.data.cookTime}</span>
+    </div>
+    {recipe.data.servings && (
+      <div class="recipe-spec">
+        <span class="recipe-spec__label">Serves</span>
+        <span class="recipe-spec__value">{recipe.data.servings}</span>
+      </div>
+    )}
+    <div class="recipe-spec">
+      <span class="recipe-spec__label">Season</span>
+      <span class="recipe-spec__value">{recipe.data.season}</span>
+    </div>
+  </div>
+
+  <figure class="single__hero">
+    {recipe.data.image ? (
+      <img src={recipe.data.image} alt={recipe.data.title} />
+    ) : (
+      <div class="single__hero-placeholder">
+        <span><em>{recipe.data.title}</em></span>
+      </div>
+    )}
+  </figure>
+
+  <div class="single__body">
+    <Content />
+  </div>
+
+  <footer class="single__footer">
+    <p class="single__author-line">Written by {recipe.data.author}</p>
+    <a href="/recipes" class="single__back">← Back to all recipes</a>
+  </footer>
+</article>
+
+</BaseLayout>

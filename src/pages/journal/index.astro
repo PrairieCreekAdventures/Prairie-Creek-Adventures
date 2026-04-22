@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+---
+
+<BaseLayout title="The Journal — Prairie Creek Farms">
+
+<section class="archive">
+  <header class="archive__header">
+    <h1 class="archive__title">The <em>journal</em></h1>
+    <p class="archive__sub">Stories from the kitchen, the orchard, and the long way home.</p>
+  </header>
+
+  <div class="archive__grid">
+    {posts.map(post => (
+      <article class="post">
+        <a href={`/journal/${post.id}`} class="post__image">
+          {post.data.image ? (
+            <img src={post.data.image} alt={post.data.title} />
+          ) : (
+            <div class="single__hero-placeholder" style="aspect-ratio: 4/3; font-size: 1rem;">
+              <span>{post.data.title}</span>
+            </div>
+          )}
+        </a>
+        <div class="post__content">
+          <div class="post__meta">
+            <span class="post__cat">{post.data.category}</span>
+            <span class="dot">·</span>
+            <span>{fmtDate(post.data.date)}</span>
+          </div>
+          <h3 class="post__title"><a href={`/journal/${post.id}`}>{post.data.title}</a></h3>
+          <p class="post__excerpt">{post.data.excerpt}</p>
+          <span class="post__author">— {post.data.author}</span>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+</BaseLayout>

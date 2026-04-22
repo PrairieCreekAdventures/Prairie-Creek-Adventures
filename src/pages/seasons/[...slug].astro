@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const seasons = await getCollection('seasons');
+  return seasons.map(season => ({
+    params: { slug: season.id },
+    props: { season },
+  }));
+}
+
+const { season } = Astro.props;
+
+// Match recipes whose "season" field matches this season's title
+const recipes = (await getCollection('recipes', ({ data }) =>
+  !data.draft && data.season.toLowerCase() === season.data.title.toLowerCase()
+)).sort((a, b) => (a.data.number || 999) - (b.data.number || 999));
+
+// Match posts whose category loosely relates (optional — shown if any)
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 6);
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+---
+
+<BaseLayout title={`${season.data.title} — Prairie Creek Farms`}>
+
+<section class="archive">
+  <header class="archive__header">
+    <span class="single__cat">{season.data.volume}{season.data.current ? ' · Current Issue' : ''}</span>
+    <h1 class="archive__title">
+      <em>{season.data.title}</em>
+    </h1>
+    <p class="archive__sub">{season.data.description}</p>
+  </header>
+
+  {recipes.length > 0 && (
+    <div class="recipes__inner" style="max-width: 1100px; margin: 0 auto 5rem; padding: 0 var(--gutter);">
+      <div class="section-head">
+        <span class="section-head__num">Recipes</span>
+        <h3 class="section-head__title">From this season</h3>
+      </div>
+      <div class="recipes__list">
+        {recipes.map((recipe, i) => (
+          <a href={`/recipes/${recipe.id}`} class="recipe-row">
+            <span class="recipe-row__num">{String(recipe.data.number || (i + 1)).padStart(3, '0')}</span>
+            <div class="recipe-row__main">
+              <h4>{recipe.data.title}</h4>
+              <p>{recipe.data.tagline}</p>
+            </div>
+            <span class="recipe-row__time">{recipe.data.cookTime}</span>
+            <span class="recipe-row__tag">{recipe.data.season}</span>
+            <span class="recipe-row__arrow">→</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {posts.length > 0 && (
+    <div class="archive__grid">
+      {posts.map(post => (
+        <article class="post">
+          <a href={`/journal/${post.id}`} class="post__image">
+            {post.data.image ? (
+              <img src={post.data.image} alt={post.data.title} />
+            ) : (
+              <div class="single__hero-placeholder" style="aspect-ratio: 4/3; font-size: 1rem;">
+                <span>{post.data.title}</span>
+              </div>
+            )}
+          </a>
+          <div class="post__content">
+            <div class="post__meta">
+              <span class="post__cat">{post.data.category}</span>
+              <span class="dot">·</span>
+              <span>{fmtDate(post.data.date)}</span>
+            </div>
+            <h3 class="post__title"><a href={`/journal/${post.id}`}>{post.data.title}</a></h3>
+            <p class="post__excerpt">{post.data.excerpt}</p>
+            <span class="post__author">— {post.data.author}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+  )}
+</section>
+
+</BaseLayout>

@@ -1,0 +1,106 @@
+---
+import '../styles/global.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Prairie Creek Farms — Stories from the Land',
+  description = 'A seasonal journal of recipes, stories, and slow living from Prairie Creek Farms.'
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500&display=swap"
+  rel="stylesheet"
+/>
+</head>
+<body>
+
+<div class="announce">
+  <div class="announce__inner">
+    <span class="announce__dot"></span>
+    <span>Autumn Issue No. 14 — now reading</span>
+    <span class="announce__sep">·</span>
+    <a href="/#journal">Browse the journal</a>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <nav class="nav nav--left">
+      <a href="/recipes">Recipes</a>
+      <a href="/journal">Journal</a>
+      <a href="/seasons">Seasons</a>
+    </nav>
+
+    <a href="/" class="wordmark">
+      <span class="wordmark__top">Prairie Creek</span>
+      <span class="wordmark__rule"></span>
+      <span class="wordmark__bot">Farms · Est. 1948</span>
+    </a>
+
+    <nav class="nav nav--right">
+      <a href="/about">About</a>
+      <a href="/shop">Shop</a>
+      <a href="/#subscribe" class="nav__cta">Subscribe</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <slot />
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <span class="site-footer__wordmark">Prairie Creek</span>
+      <span class="site-footer__tagline">Farms · Hill Country · Est. 1948</span>
+    </div>
+
+    <nav class="site-footer__nav">
+      <div class="site-footer__col">
+        <h5>The Journal</h5>
+        <a href="/recipes">Recipes</a>
+        <a href="/seasons">Seasons</a>
+        <a href="/journal">Field Notes</a>
+        <a href="/journal">Archive</a>
+      </div>
+      <div class="site-footer__col">
+        <h5>The Farm</h5>
+        <a href="/about">Our Story</a>
+        <a href="/visit">Visit</a>
+        <a href="/shop">Farm Store</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <div class="site-footer__col">
+        <h5>Follow</h5>
+        <a href="#">Instagram</a>
+        <a href="#">Pinterest</a>
+        <a href="#">Substack</a>
+        <a href="/#subscribe">Newsletter</a>
+      </div>
+    </nav>
+  </div>
+  <div class="site-footer__base">
+    <span>© 2026 Prairie Creek Farms. All rights reserved.</span>
+    <span class="site-footer__sep">✳</span>
+    <span>Made slowly, in the hill country.</span>
+  </div>
+</footer>
+
+<script src="/script.js"></script>
+</body>
+</html>

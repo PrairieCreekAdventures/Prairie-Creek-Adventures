@@ -1,0 +1,93 @@
+# Decap CMS Configuration
+# This file tells the admin panel what content you can edit and how
+
+backend:
+  name: git-gateway
+  branch: main
+
+# Store uploaded images in public/images/uploads
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+# Optional: enable editorial workflow (drafts, review, publish)
+publish_mode: editorial_workflow
+
+# Site URL (update after deploy)
+site_url: https://prairiecreekfarms.com
+display_url: https://prairiecreekfarms.com
+logo_url: https://prairiecreekfarms.com/favicon.svg
+
+collections:
+  # ============ POSTS ============
+  - name: "posts"
+    label: "Journal Posts"
+    label_singular: "Post"
+    folder: "src/content/posts"
+    create: true
+    slug: "{{slug}}"
+    preview_path: "journal/{{slug}}"
+    summary: "{{title}} — {{date | date('MMM D, YYYY')}}"
+    sortable_fields: ['date', 'title']
+    view_filters:
+      - label: "Featured"
+        field: featured
+        pattern: true
+      - label: "Drafts"
+        field: draft
+        pattern: true
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Author", name: "author", widget: "string", default: "Margaret Ellison" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options: ["Field Notes", "Recipe", "Ritual", "Garden", "Essay", "Farm Life"]
+        default: "Field Notes"
+      - { label: "Short Excerpt", name: "excerpt", widget: "text", hint: "Shown on the homepage and cards — aim for 1-2 sentences." }
+      - { label: "Hero Image", name: "image", widget: "image", required: false, hint: "Recommended: 1600x900px" }
+      - { label: "Feature on homepage?", name: "featured", widget: "boolean", default: false, hint: "Only one post should be featured at a time." }
+      - { label: "Save as draft", name: "draft", widget: "boolean", default: false }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  # ============ RECIPES ============
+  - name: "recipes"
+    label: "Recipes"
+    label_singular: "Recipe"
+    folder: "src/content/recipes"
+    create: true
+    slug: "{{slug}}"
+    preview_path: "recipes/{{slug}}"
+    summary: "{{title}} ({{season}})"
+    sortable_fields: ['number', 'date', 'title']
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Tagline", name: "tagline", widget: "string", hint: "One-line subtitle that shows under the title." }
+      - { label: "Author", name: "author", widget: "string", default: "Margaret Ellison" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Cook Time", name: "cookTime", widget: "string", hint: "e.g. '45 min' or '2 hrs'" }
+      - label: "Season"
+        name: "season"
+        widget: "select"
+        options: ["Spring", "Summer", "Autumn", "Winter", "Everyday", "Keeping"]
+      - { label: "Servings", name: "servings", widget: "string", required: false, hint: "e.g. 'Serves 6' — optional" }
+      - { label: "Display Number", name: "number", widget: "number", required: false, hint: "Used to order recipes on the index. Lower numbers appear first." }
+      - { label: "Hero Image", name: "image", widget: "image", required: false }
+      - { label: "Save as draft", name: "draft", widget: "boolean", default: false }
+      - { label: "Recipe Body", name: "body", widget: "markdown", hint: "Write ingredients, method, and any notes — use headings like '## Ingredients' and '## Method'." }
+
+  # ============ SEASONS ============
+  - name: "seasons"
+    label: "Seasons / Issues"
+    label_singular: "Season"
+    folder: "src/content/seasons"
+    create: true
+    slug: "{{slug}}"
+    preview_path: "seasons/{{slug}}"
+    fields:
+      - { label: "Season Name", name: "title", widget: "string", hint: "e.g. 'Autumn'" }
+      - { label: "Volume", name: "volume", widget: "string", hint: "e.g. 'Vol. XIV'" }
+      - { label: "Description", name: "description", widget: "text", hint: "A short phrase describing this season." }
+      - { label: "Display Order", name: "order", widget: "number", default: 1, hint: "1=Spring, 2=Summer, 3=Autumn, 4=Winter" }
+      - { label: "Current Issue?", name: "current", widget: "boolean", default: false, hint: "Only one season should be marked current." }
+      - { label: "Body (optional)", name: "body", widget: "markdown", required: false }

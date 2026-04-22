@@ -1,0 +1,391 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Pull all posts, sort newest first, drop drafts
+const allPosts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// First featured post (or fall back to newest)
+const featuredPost = allPosts.find(p => p.data.featured) || allPosts[0];
+
+// Next 5 posts for the journal grid (excluding the featured one shown above)
+const journalPosts = allPosts
+  .filter(p => p.id !== featuredPost?.id)
+  .slice(0, 5);
+
+// Top 6 recipes for the recipe index
+const recipes = (await getCollection('recipes', ({ data }) => !data.draft))
+  .sort((a, b) => (a.data.number || 999) - (b.data.number || 999))
+  .slice(0, 6);
+
+// All seasons in order
+const seasons = (await getCollection('seasons'))
+  .sort((a, b) => a.data.order - b.data.order);
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+---
+
+<BaseLayout>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero__grid">
+    <div class="hero__text">
+      <div class="eyebrow">
+        <span class="eyebrow__no">Vol. XIV</span>
+        <span class="eyebrow__bar"></span>
+        <span>The Autumn Table</span>
+      </div>
+
+      <h1 class="hero__title">
+        <span class="hero__line">Slow mornings,</span>
+        <span class="hero__line hero__line--italic">long harvests,</span>
+        <span class="hero__line">and the recipes</span>
+        <span class="hero__line">we return to.</span>
+      </h1>
+
+      <p class="hero__lede">
+        A seasonal journal from a working farm in the hill country — where the orchard is heavy, the kitchen is warm, and nothing is in a hurry.
+      </p>
+
+      <div class="hero__meta">
+        <a href="#featured" class="btn btn--primary">
+          <span>Read the Autumn Issue</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12m0 0L7 1m6 6l-6 6" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <span class="hero__issue">Issue 14 · October 2026</span>
+      </div>
+    </div>
+
+    <figure class="hero__image">
+      <div class="hero__image-wrap">
+        <svg viewBox="0 0 600 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" class="hero__svg">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#d8c9a8"/>
+              <stop offset="55%" stop-color="#c9b38a"/>
+              <stop offset="100%" stop-color="#8a7a56"/>
+            </linearGradient>
+            <linearGradient id="hill1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#4a5544"/>
+              <stop offset="100%" stop-color="#2d3a2c"/>
+            </linearGradient>
+            <linearGradient id="hill2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6b7356"/>
+              <stop offset="100%" stop-color="#4d5742"/>
+            </linearGradient>
+            <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#a89668"/>
+              <stop offset="100%" stop-color="#7d6d47"/>
+            </linearGradient>
+            <radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0%" stop-color="#f5e6c4" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#f5e6c4" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="600" height="780" fill="url(#sky)"/>
+          <circle cx="420" cy="200" r="180" fill="url(#sun)"/>
+          <circle cx="420" cy="200" r="42" fill="#f0dfb5" opacity="0.85"/>
+          <path d="M0,420 Q120,360 240,400 T480,390 T600,420 L600,780 L0,780 Z" fill="url(#hill2)" opacity="0.55"/>
+          <path d="M0,480 Q140,430 280,470 T540,460 T600,490 L600,780 L0,780 Z" fill="url(#hill1)" opacity="0.75"/>
+          <path d="M0,540 Q160,510 320,535 T600,530 L600,780 L0,780 Z" fill="url(#field)"/>
+          <g opacity="0.35" stroke="#5d4e2a" stroke-width="0.6" fill="none">
+            <path d="M0,600 Q150,595 300,605 T600,598"/>
+            <path d="M0,630 Q150,625 300,635 T600,628"/>
+            <path d="M0,660 Q150,655 300,665 T600,658"/>
+            <path d="M0,690 Q150,685 300,695 T600,688"/>
+            <path d="M0,720 Q150,715 300,725 T600,718"/>
+          </g>
+          <g transform="translate(380,430)" opacity="0.85">
+            <path d="M0,60 L0,20 L20,0 L60,0 L80,20 L80,60 Z" fill="#2a2018"/>
+            <rect x="35" y="35" width="10" height="25" fill="#1a130d"/>
+            <path d="M0,20 L80,20" stroke="#1a130d" stroke-width="1"/>
+          </g>
+        </svg>
+        <div class="hero__grain"></div>
+      </div>
+      <figcaption class="hero__caption">
+        <span class="hero__caption-rule"></span>
+        The north field at dusk, October —<br/>
+        photographed by <em>Hannah Wells</em>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="ticker">
+    <div class="ticker__track">
+      <span>In season now</span><span class="ticker__dot">✳</span>
+      <span>Apples</span><span class="ticker__dot">✳</span>
+      <span>Butternut</span><span class="ticker__dot">✳</span>
+      <span>Pears</span><span class="ticker__dot">✳</span>
+      <span>Cranberries</span><span class="ticker__dot">✳</span>
+      <span>Sweet Potatoes</span><span class="ticker__dot">✳</span>
+      <span>Brussels Sprouts</span><span class="ticker__dot">✳</span>
+      <span>Fennel</span><span class="ticker__dot">✳</span>
+      <span>Quince</span><span class="ticker__dot">✳</span>
+      <span>In season now</span><span class="ticker__dot">✳</span>
+      <span>Apples</span><span class="ticker__dot">✳</span>
+      <span>Butternut</span><span class="ticker__dot">✳</span>
+      <span>Pears</span><span class="ticker__dot">✳</span>
+      <span>Cranberries</span><span class="ticker__dot">✳</span>
+      <span>Sweet Potatoes</span><span class="ticker__dot">✳</span>
+      <span>Brussels Sprouts</span><span class="ticker__dot">✳</span>
+      <span>Fennel</span><span class="ticker__dot">✳</span>
+      <span>Quince</span><span class="ticker__dot">✳</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED STORY -->
+{featuredPost && (
+  <section id="featured" class="featured">
+    <div class="featured__inner">
+      <div class="featured__label">
+        <span class="featured__ornament">❋</span>
+        <span>The Featured Story</span>
+        <span class="featured__ornament">❋</span>
+      </div>
+
+      <div class="featured__grid">
+        <figure class="featured__image">
+          {featuredPost.data.image ? (
+            <img src={featuredPost.data.image} alt={featuredPost.data.title} />
+          ) : (
+            <div class="single__hero-placeholder" style="aspect-ratio: 4/5;">
+              <span>{featuredPost.data.title}</span>
+            </div>
+          )}
+        </figure>
+
+        <div class="featured__content">
+          <div class="featured__kicker">{featuredPost.data.category}</div>
+          <h2 class="featured__title">{featuredPost.data.title}</h2>
+          <p class="featured__byline">
+            <span>By {featuredPost.data.author}</span>
+            <span class="dot">·</span>
+            <span>{fmtDate(featuredPost.data.date)}</span>
+          </p>
+          <p class="featured__lede">{featuredPost.data.excerpt}</p>
+          <a href={`/journal/${featuredPost.id}`} class="featured__link">
+            <span>Continue reading</span>
+            <span class="featured__link-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+<!-- SEASONS -->
+<section id="seasons" class="seasons">
+  <div class="seasons__inner">
+    <div class="section-head">
+      <span class="section-head__num">01</span>
+      <h3 class="section-head__title">Browse by season</h3>
+      <p class="section-head__sub">Four issues a year. One for each turn of the field.</p>
+    </div>
+
+    <div class="seasons__grid">
+      {seasons.map(season => (
+        <a href={`/seasons/${season.id}`} class={`season-card season-card--${season.id} ${season.data.current ? 'season-card--current' : ''}`}>
+          <div class="season-card__art">
+            <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="150" cy="150" r="120" fill="currentColor" opacity="0.15"/>
+              <text x="150" y="165" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="48" fill="currentColor" opacity="0.6">{season.data.title.charAt(0)}</text>
+            </svg>
+          </div>
+          <div class="season-card__meta">
+            <span class="season-card__label">{season.data.volume}{season.data.current ? ' · Current' : ''}</span>
+            <h4>{season.data.title}</h4>
+            <p>{season.data.description}</p>
+            <span class="season-card__count">View stories →</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- JOURNAL -->
+<section id="journal" class="journal">
+  <div class="journal__inner">
+    <div class="section-head section-head--light">
+      <span class="section-head__num">02</span>
+      <h3 class="section-head__title">Lately, in the journal</h3>
+      <p class="section-head__sub">Stories from the kitchen, the orchard, and the long way home.</p>
+    </div>
+
+    <div class="journal__grid">
+      {journalPosts.map((post, i) => (
+        <article class={i === 0 ? 'post post--large' : 'post'}>
+          <a href={`/journal/${post.id}`} class="post__image">
+            {post.data.image ? (
+              <img src={post.data.image} alt={post.data.title} />
+            ) : (
+              <div class="single__hero-placeholder" style="aspect-ratio: 4/3; font-size: 1rem;">
+                <span>{post.data.title}</span>
+              </div>
+            )}
+          </a>
+          <div class="post__content">
+            <div class="post__meta">
+              <span class="post__cat">{post.data.category}</span>
+              <span class="dot">·</span>
+              <span>{fmtDate(post.data.date)}</span>
+            </div>
+            <h3 class="post__title"><a href={`/journal/${post.id}`}>{post.data.title}</a></h3>
+            <p class="post__excerpt">{post.data.excerpt}</p>
+            <span class="post__author">— {post.data.author}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="journal__more">
+      <a href="/journal" class="btn btn--ghost">View all stories →</a>
+    </div>
+  </div>
+</section>
+
+<!-- PULL QUOTE -->
+<section class="pullquote">
+  <div class="pullquote__inner">
+    <span class="pullquote__mark">"</span>
+    <p class="pullquote__text">
+      What we cook is a record of what we love, what we remember,<br/>
+      and what the land can still give us.
+    </p>
+    <p class="pullquote__attr">
+      <span class="pullquote__rule"></span>
+      Margaret Ellison, <em>founder</em>
+    </p>
+  </div>
+</section>
+
+<!-- RECIPE INDEX -->
+<section id="recipes" class="recipes">
+  <div class="recipes__inner">
+    <div class="section-head">
+      <span class="section-head__num">03</span>
+      <h3 class="section-head__title">The recipe index</h3>
+      <p class="section-head__sub">Tested and re-tested in our kitchen. Written for cooks, not algorithms.</p>
+    </div>
+
+    <div class="recipes__list">
+      {recipes.map((recipe, i) => (
+        <a href={`/recipes/${recipe.id}`} class="recipe-row">
+          <span class="recipe-row__num">{String(recipe.data.number || (i + 1)).padStart(3, '0')}</span>
+          <div class="recipe-row__main">
+            <h4>{recipe.data.title}</h4>
+            <p>{recipe.data.tagline}</p>
+          </div>
+          <span class="recipe-row__time">{recipe.data.cookTime}</span>
+          <span class="recipe-row__tag">{recipe.data.season}</span>
+          <span class="recipe-row__arrow">→</span>
+        </a>
+      ))}
+    </div>
+
+    <div class="journal__more" style="margin-top: 3rem;">
+      <a href="/recipes" class="btn btn--ghost">View all recipes →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="about">
+  <div class="about__inner">
+    <div class="about__left">
+      <div class="eyebrow eyebrow--dark">
+        <span class="eyebrow__bar"></span>
+        <span>About the farm</span>
+      </div>
+      <h2 class="about__title">
+        We have been here,<br/>
+        <em>quietly, for three generations.</em>
+      </h2>
+      <p class="about__body">
+        Prairie Creek Farms sits on 240 acres of rolling country in the hill region — orchards, a kitchen garden, the old barn, and the long view west. We grow what we eat. We share what we grow. And once a season, we put it all down on paper.
+      </p>
+      <p class="about__body">
+        This journal is our way of slowing things down. Of remembering that food, at its best, is a thing you make with your hands, for people you love, with what the year has given you.
+      </p>
+      <div class="about__signature">
+        <span class="about__script">Margaret &amp; Henry</span>
+        <span class="about__title-small">— the Ellisons</span>
+      </div>
+    </div>
+
+    <div class="about__right">
+      <figure class="about__image">
+        <svg viewBox="0 0 500 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="portraitBg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#c4b594"/>
+              <stop offset="100%" stop-color="#8a7a56"/>
+            </linearGradient>
+          </defs>
+          <rect width="500" height="600" fill="url(#portraitBg)"/>
+          <rect x="40" y="40" width="420" height="520" fill="none" stroke="#6a5838" stroke-width="2" opacity="0.4"/>
+          <g transform="translate(250,380)">
+            <rect x="-160" y="80" width="320" height="12" fill="#4d3a22"/>
+            <rect x="-150" y="92" width="8" height="60" fill="#4d3a22"/>
+            <rect x="142" y="92" width="8" height="60" fill="#4d3a22"/>
+            <g transform="translate(-70,0)">
+              <circle cx="0" cy="-50" r="30" fill="#3a2d1a"/>
+              <path d="M-40,-20 Q-45,60 -30,80 L30,80 Q45,60 40,-20 Q25,-35 0,-35 Q-25,-35 -40,-20 Z" fill="#2d3a2c"/>
+            </g>
+            <g transform="translate(70,0)">
+              <circle cx="0" cy="-50" r="30" fill="#3a2d1a"/>
+              <path d="M-40,-20 Q-45,60 -30,80 L30,80 Q45,60 40,-20 Q25,-35 0,-35 Q-25,-35 -40,-20 Z" fill="#4d3a22"/>
+            </g>
+          </g>
+          <circle cx="120" cy="140" r="80" fill="#f0e4c8" opacity="0.25"/>
+        </svg>
+        <figcaption>Margaret and Henry on the east porch, 2025</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- SUBSCRIBE -->
+<section id="subscribe" class="subscribe">
+  <div class="subscribe__inner">
+    <div class="subscribe__ornament">
+      <svg viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2,10 L30,10 M50,10 L78,10" stroke="currentColor" stroke-width="0.8" fill="none"/>
+        <circle cx="40" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="0.8"/>
+        <circle cx="40" cy="10" r="1" fill="currentColor"/>
+      </svg>
+    </div>
+    <h2 class="subscribe__title">One letter,<br/><em>once a season</em></h2>
+    <p class="subscribe__lede">
+      A quiet note in your inbox — recipes, field notes, and a few good books — four times a year, when the light changes.
+    </p>
+
+    <form class="subscribe__form" name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="newsletter" />
+      <p class="hidden" style="display:none"><label>Don't fill this out: <input name="bot-field" /></label></p>
+      <div class="subscribe__fields">
+        <label class="subscribe__label">
+          <span>Your name</span>
+          <input type="text" name="name" required />
+        </label>
+        <label class="subscribe__label">
+          <span>Your email</span>
+          <input type="email" name="email" required />
+        </label>
+        <button type="submit" class="btn btn--primary btn--full">
+          <span>Subscribe</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12m0 0L7 1m6 6l-6 6" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </form>
+    <p class="subscribe__fine">No spam, ever. Unsubscribe in one click.</p>
+  </div>
+</section>
+
+</BaseLayout>

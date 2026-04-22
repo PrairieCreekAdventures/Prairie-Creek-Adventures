@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const recipes = (await getCollection('recipes', ({ data }) => !data.draft))
+  .sort((a, b) => (a.data.number || 999) - (b.data.number || 999));
+---
+
+<BaseLayout title="Recipes — Prairie Creek Farms">
+
+<section class="recipes" style="background: var(--cream); padding-top: clamp(3rem, 6vw, 5rem);">
+  <div class="recipes__inner">
+    <header class="archive__header">
+      <h1 class="archive__title">The <em>recipe index</em></h1>
+      <p class="archive__sub">Tested and re-tested in our kitchen. Written for cooks, not algorithms.</p>
+    </header>
+
+    <div class="recipes__list">
+      {recipes.map((recipe, i) => (
+        <a href={`/recipes/${recipe.id}`} class="recipe-row">
+          <span class="recipe-row__num">{String(recipe.data.number || (i + 1)).padStart(3, '0')}</span>
+          <div class="recipe-row__main">
+            <h4>{recipe.data.title}</h4>
+            <p>{recipe.data.tagline}</p>
+          </div>
+          <span class="recipe-row__time">{recipe.data.cookTime}</span>
+          <span class="recipe-row__tag">{recipe.data.season}</span>
+          <span class="recipe-row__arrow">→</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+</BaseLayout>

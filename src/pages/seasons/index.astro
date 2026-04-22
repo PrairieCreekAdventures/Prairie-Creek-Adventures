@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const seasons = (await getCollection('seasons'))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="Seasons — Prairie Creek Farms">
+
+<section class="seasons" style="padding-top: clamp(3rem, 6vw, 5rem);">
+  <div class="seasons__inner">
+    <header class="archive__header">
+      <h1 class="archive__title">Browse by <em>season</em></h1>
+      <p class="archive__sub">Four issues a year. One for each turn of the field.</p>
+    </header>
+
+    <div class="seasons__grid">
+      {seasons.map(season => (
+        <a href={`/seasons/${season.id}`} class={`season-card season-card--${season.id} ${season.data.current ? 'season-card--current' : ''}`}>
+          <div class="season-card__art">
+            <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="150" cy="150" r="120" fill="currentColor" opacity="0.15"/>
+              <text x="150" y="165" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="48" fill="currentColor" opacity="0.6">{season.data.title.charAt(0)}</text>
+            </svg>
+          </div>
+          <div class="season-card__meta">
+            <span class="season-card__label">{season.data.volume}{season.data.current ? ' · Current' : ''}</span>
+            <h4>{season.data.title}</h4>
+            <p>{season.data.description}</p>
+            <span class="season-card__count">View stories →</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+</BaseLayout>
