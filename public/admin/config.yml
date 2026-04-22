@@ -1,21 +1,39 @@
-# Decap CMS Configuration
-# This file tells the admin panel what content you can edit and how
+# Prairie Creek Farms — Decap CMS Config
+# Using DecapBridge for authentication
 
+# DecapBridge PKCE auth
 backend:
   name: git-gateway
+  repo: PrairieCreekAdventures/Prairie-Creek-Adventures
   branch: main
+  auth_type: pkce
+  base_url: https://auth.decapbridge.com
+  auth_endpoint: /sites/c51f80c9-8f51-452c-9493-bc6d47a9f2af/pkce
+  auth_token_endpoint: /sites/c51f80c9-8f51-452c-9493-bc6d47a9f2af/token
+  gateway_url: https://gateway.decapbridge.com
+  commit_messages:
+    create: Create {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via DecapBridge
+    update: Update {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via DecapBridge
+    delete: Delete {{collection}} "{{slug}}" - {{author-name}} <{{author-login}}> via DecapBridge
+    uploadMedia: Upload "{{path}}" - {{author-name}} <{{author-login}}> via DecapBridge
+    deleteMedia: Delete "{{path}}" - {{author-name}} <{{author-login}}> via DecapBridge
 
-# Store uploaded images in public/images/uploads
+auth:
+  email_claim: email
+  first_name_claim: first_name
+  last_name_claim: last_name
+  avatar_url_claim: avatar_url
+
+logo_url: https://decapbridge.com/decapcms-with-bridge.svg
+site_url: https://deft-toffee-c3be90.netlify.app
+display_url: https://deft-toffee-c3be90.netlify.app
+
+# Where uploaded images go
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
 
-# Optional: enable editorial workflow (drafts, review, publish)
+# Editorial workflow (drafts, review, publish)
 publish_mode: editorial_workflow
-
-# Site URL (update after deploy)
-site_url: https://prairiecreekfarms.com
-display_url: https://prairiecreekfarms.com
-logo_url: https://prairiecreekfarms.com/favicon.svg
 
 collections:
   # ============ POSTS ============
